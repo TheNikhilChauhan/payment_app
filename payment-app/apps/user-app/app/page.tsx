@@ -1,7 +1,9 @@
-import { PrismaClient } from "@repo/db/client";
+"use client";
 
-const client = new PrismaClient();
+import { useBalance } from "@repo/store/balance";
 
-export default function Page() {
-  return <div className=" text-2xl">hi there</div>;
+// eslint-disable-next-line react/display-name
+export default function () {
+  const balance = useBalance();
+  return <div>hi there {balance}</div>;
 }
