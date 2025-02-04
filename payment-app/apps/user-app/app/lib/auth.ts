@@ -1,73 +1,87 @@
+import db from "../../../../packages/db/src";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcrypt";
-import db from "@repo/db/client";
+import { Session } from "next-auth";
+import { JWT } from "next-auth/jwt";
+import { NextAuthOptions } from "next-auth";
 
-interface Credentials {
-  phone: string;
-  password: string;
-}
-
-export const authOptions = {
+export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
       name: "Credentials",
       credentials: {
-        phone: {
+        number: {
           label: "Phone number",
           type: "text",
-          placeholder: "2344542",
+          placeholder: "1231231231",
           required: true,
         },
         password: { label: "Password", type: "password", required: true },
       },
-      async authorize(credentials: Credentials) {
-        const hashedPassword = await bcrypt.hash(credentials.password, 10);
+      // TODO: User credentials type from next-aut
+      async authorize(credentials) {
+        console.log("The Credentials", credentials);
+        console.log("The user", db.user);
+        const { number, password } = credentials as Record<
+          "number" | "password",
+          string
+        >;
         const existingUser = await db.user.findFirst({
           where: {
-            number: credentials.phone,
+            number: number,
           },
         });
 
         if (existingUser) {
           const passwordValidation = await bcrypt.compare(
-            credentials.password,
+            password,
             existingUser.password
           );
           if (passwordValidation) {
             return {
               id: existingUser.id.toString(),
               name: existingUser.name,
-              number: existingUser.number,
+              email: existingUser.number,
             };
           }
-          return null;
+          return {
+            id: existingUser.id.toString(),
+            name: existingUser.name,
+            email: existingUser.number,
+          };
         }
 
         try {
-          const newUser = await db.user.create({
+          const hashedPassword = await bcrypt.hash(password, 10);
+          const user = await db.user.create({
             data: {
-              number: credentials.phone,
+              number: number,
               password: hashedPassword,
             },
           });
 
           return {
-            id: newUser.id.toString(),
-            name: newUser.name,
-            number: newUser.number,
+            id: user.id.toString(),
+            name: user.name,
+            email: user.number,
           };
-        } catch (error) {
-          console.error(error);
+        } catch (e) {
+          console.error(e);
         }
+
         return null;
       },
     }),
   ],
-  secret: process.env.JWT_SECRET || "secret",
-
+  secret: process.env.JWT_SECRET,
   callbacks: {
-    async session({ token, session }: any) {
-      session.user.id = token.sub;
+    // TODO: can u fix the type here? Using any is bad
+    async session({ token, session }: { token: JWT; session: Session }) {
+      console.log("the token", token);
+      if (session.user) {
+        session.user.id = token.sub as string;
+      }
+      console.log("the session", session);
 
       return session;
     },
