@@ -20,8 +20,6 @@ export const authOptions: NextAuthOptions = {
       },
       // TODO: User credentials type from next-aut
       async authorize(credentials) {
-        console.log("The Credentials", credentials);
-        console.log("The user", db.user);
         const { number, password } = credentials as Record<
           "number" | "password",
           string
@@ -77,11 +75,9 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     // TODO: can u fix the type here? Using any is bad
     async session({ token, session }: { token: JWT; session: Session }) {
-      console.log("the token", token);
       if (session.user) {
         session.user.id = token.sub as string;
       }
-      console.log("the session", session);
 
       return session;
     },
