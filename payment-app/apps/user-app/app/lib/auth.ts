@@ -55,7 +55,11 @@ export const authOptions: NextAuthOptions = {
             data: {
               number: number,
               password: hashedPassword,
+              Balance: {
+                create: { amount: 0, locked: 0 },
+              },
             },
+            include: { Balance: true },
           });
 
           return {

@@ -5,8 +5,8 @@ const app = express();
 
 app.use(express.json());
 
+//todo: on ramp transaction if it is processing then only let it go for success
 app.post("/hdfcWebhook", async (req, res) => {
-  console.log(req.body);
   const paymentInformation: {
     token: string;
     userId: string;
@@ -18,7 +18,6 @@ app.post("/hdfcWebhook", async (req, res) => {
   };
 
   try {
-    console.log(req.body);
     await db.$transaction([
       db.balance.updateMany({
         where: {
