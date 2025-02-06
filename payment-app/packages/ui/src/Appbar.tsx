@@ -2,6 +2,7 @@ import { Button } from "./button";
 
 interface AppbarProps {
   user?: {
+    id: string;
     name?: string | null;
   };
   onSignin: () => void;

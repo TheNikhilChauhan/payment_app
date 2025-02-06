@@ -1,5 +1,4 @@
-import React from "react";
-const Dashboard: React.FC = (): JSX.Element => {
+const Dashboard = () => {
   return <div>Dashboard</div>;
 };
 
