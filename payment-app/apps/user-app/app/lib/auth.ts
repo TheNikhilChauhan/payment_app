@@ -79,7 +79,7 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     // TODO: can u fix the type here? Using any is bad
     async session({ token, session }: { token: JWT; session: Session }) {
-      if (session.user) {
+      if (session.user && token.sub) {
         session.user.id = token.sub as string;
       }
 

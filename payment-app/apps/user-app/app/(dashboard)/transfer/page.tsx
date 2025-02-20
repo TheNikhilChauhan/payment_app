@@ -7,6 +7,7 @@ import prisma from "../../../../../packages/db/src";
 
 async function getBalance() {
   const session = await getServerSession(authOptions);
+
   const balance = await prisma.balance.findFirst({
     where: {
       userId: Number(session?.user?.id),
@@ -37,6 +38,8 @@ async function getOnRampTransaction() {
 const Transfer = async () => {
   const balance = await getBalance();
   const transactions = await getOnRampTransaction();
+  console.log(balance);
+  console.log(balance.amount, balance.locked);
 
   return (
     <div className="w-screen">
